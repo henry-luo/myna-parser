@@ -42,7 +42,7 @@ function EvalArithmetic(exprNode)
                     v = -v;
             return v;
         }
-        case "parenExpr" : return EvalArithmetic(exprNode.children[0]);
+        case "parenExpr": return EvalArithmetic(exprNode.children[0]);
         case "number": return Number(exprNode.allText);
         case "addExpr": return EvalArithmetic(exprNode.children[0]);
         case "subExpr": return EvalArithmetic(exprNode.children[0]);
