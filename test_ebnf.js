@@ -3,7 +3,7 @@ var myna = require('./myna');
 var grammar = require('./grammars/grammar_ebnf')(myna);
 
 // Get the parser 
-var parser = m.parsers.ebnf; 
+var parser = myna.parsers.ebnf; 
 
 // Parse some input and print the AST
 var input = `

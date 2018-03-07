@@ -30,21 +30,17 @@ function CreateEbnfGrammar(myna) {
 		this.string			= m.choice(this.singleQuoteStr, this.doubleQuoteStr).ast;
 
 		// patterns 
-		this.group			= m.parenthesized(this.string); // this.pattern - recursion
+        let _this = this;		
+		this.group			= m.parenthesized(m.delay(function() { return _this.pattern; }));
+		// this.group		= m.parenthesized(this.pattern); // this.pattern - recursion
+ 
 		this.term			= m.choice(this.group, this.string, this.charClass);
 		this.repeat			= m.seq(this.term, m.char('?+*').opt);
-		this.concat			= m.repeat.oneOrMore;
+		this.concat			= this.repeat.oneOrMore;
 		this.alternate		= m.choice(m.seq('|', this.concat), m.seq('-', this.concat));  // precedence of exclusion '-' not clear
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
-		/*
-        let _this = this;
-        this.value = m.choice(this.string, this.bool, this.null, this.number, 
-            // Using a lazy evaluation rule to allow recursive rule definitions  
-            m.delay(function() { return m.choice(_this.object, _this.array); 
-        }));
-		*/
 		
-		this.identifier		= m.choice(this.letter, '_', this.digit).oneOrMore;
+		this.identifier		= m.choice(m.letter, '_', m.digit).oneOrMore;
 		this.rule 			= m.seq(this.ws, this.identifier, this.ws, '::=', this.ws, this.pattern, this.ws);
 		this.grammar		= this.rule.oneOrMore;
     };
