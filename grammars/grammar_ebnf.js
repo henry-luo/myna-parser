@@ -6,8 +6,7 @@ function CreateEbnfGrammar(myna) {
     // Setup a shorthand for the Myna parsing library object
     let m = myna;    
 
-    let g = new function() 
-    {
+    let g = new function() {
         // comment and whitespace 
         this.comment    	= m.seq("/*", m.advanceUntilPast("*/"));
         this.ws             = this.comment.or(m.atWs.then(m.advance)).zeroOrMore;	
@@ -29,20 +28,27 @@ function CreateEbnfGrammar(myna) {
 		this.doubleQuoteStr = m.doubleQuoted(m.notChar('"').oneOrMore);
 		this.string			= m.choice(this.singleQuoteStr, this.doubleQuoteStr).ast;
 
+		this.identifier		= m.choice(m.letter, '_', m.digit).oneOrMore.ast;
+		
 		// patterns 
-        let _this = this;		
-		this.group			= m.parenthesized(m.delay(function() { return _this.pattern; }));
-		// this.group		= m.parenthesized(this.pattern); // this.pattern - recursion
- 
-		this.term			= m.choice(this.group, this.string, this.charClass);
-		this.repeat			= m.seq(this.term, m.char('?+*').opt);
+        let _this = this;
+        this.group = // m.parenthesized(
+			m.seq('(', this.ws,
+            // using a lazy evaluation rule to allow recursive rule definitions  
+            m.delay(function() { return _this.pattern; })
+			, ')'
+        );
+		// this.group		= m.parenthesized(this.pattern); // recursion
+		this.term			= m.choice(this.identifier, this.group, this.string, this.charClass);
+		this.repeatOp		= m.char('?+*').ast;
+		this.repeat			= m.seq(this.term, this.repeatOp.opt, this.ws);
 		this.concat			= this.repeat.oneOrMore;
-		this.alternate		= m.choice(m.seq('|', this.concat), m.seq('-', this.concat));  // precedence of exclusion '-' not clear
+		this.altOp			= m.choice('|','-').ast;
+		this.alternate		= m.seq(this.altOp, this.ws, this.concat);  // precedence of exclusion '-' not clear in XML spec, we make it same as '|', to make the tree more flat
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
 		
-		this.identifier		= m.choice(m.letter, '_', m.digit).oneOrMore;
-		this.rule 			= m.seq(this.ws, this.identifier, this.ws, '::=', this.ws, this.pattern, this.ws);
-		this.grammar		= this.rule.oneOrMore;
+		this.rule 			= m.seq(this.ws, this.identifier, this.ws, '::=', this.ws, this.pattern).ast;
+		this.grammar		= this.rule.oneOrMore.ast;
     };
 
     // Register the grammar, providing a name and the default parse rule
