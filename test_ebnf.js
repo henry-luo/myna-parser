@@ -2,6 +2,11 @@
 const myna = require('./myna');
 const grammar = require('./grammars/grammar_ebnf')(myna);
 
+function loadSource(fname) {
+	const fs = require('fs');
+	return fs.readFileSync(fname).toString(); 
+}
+
 /*
 function printObj(obj, out, indent) {
 	if (obj instanceof Array) {
@@ -42,9 +47,8 @@ function printNode(ast, out, indent) {
 let parser = myna.parsers.ebnf;
 
 // Parse some input and print the AST
-let input = `
-	Query	  ::=  	Prologue* ( Select | More )
-`;
+let input = loadSource('./grammars/sparql.ebnf');
+
 try {
     var ast = parser(input);
 	if (ast == null) {

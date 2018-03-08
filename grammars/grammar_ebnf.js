@@ -9,8 +9,8 @@ function CreateEbnfGrammar(myna) {
     let g = new function() {
         // comment and whitespace 
         this.comment    	= m.seq("/*", m.advanceUntilPast("*/"));
-        this.ws             = this.comment.or(m.atWs.then(m.advance)).zeroOrMore;	
-	
+        this.ws             = m.char(" \t").or(m.seq(m.choice('\n','\r\n'), m.char(" \t"))).or(this.comment).zeroOrMore;
+		
 		// char class
 		this.rangChar		= m.letter.or(m.digit);
 		this.charRange		= m.seq(this.rangChar, '-', this.rangChar);
@@ -28,7 +28,7 @@ function CreateEbnfGrammar(myna) {
 		this.doubleQuoteStr = m.doubleQuoted(m.notChar('"').oneOrMore);
 		this.string			= m.choice(this.singleQuoteStr, this.doubleQuoteStr).ast;
 
-		this.identifier		= m.choice(m.letter, '_', m.digit).oneOrMore.ast;
+		this.identifier		= m.seq(m.letter, m.choice(m.letter, '_', '-', m.digit).oneOrMore).ast;
 		
 		// patterns 
         let _this = this;
@@ -47,8 +47,9 @@ function CreateEbnfGrammar(myna) {
 		this.alternate		= m.seq(this.altOp, this.ws, this.concat);  // precedence of exclusion '-' not clear in XML spec, we make it same as '|', to make the tree more flat
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
 		
-		this.rule 			= m.seq(this.ws, this.identifier, this.ws, '::=', this.ws, this.pattern).ast;
-		this.grammar		= this.rule.oneOrMore.ast;
+		this.newLine		= m.seq(m.seq(this.comment, this.ws).opt, m.choice('\n','\r\n'));
+		this.rule 			= m.seq(this.identifier, this.ws, '::=', this.ws, this.pattern).ast;
+		this.grammar		= m.seq(this.newLine.zeroOrMore, this.rule, m.seq(this.newLine.oneOrMore, this.rule).zeroOrMore, this.newLine.zeroOrMore).ast;
     };
 
     // Register the grammar, providing a name and the default parse rule
