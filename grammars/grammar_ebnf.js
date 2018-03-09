@@ -32,13 +32,7 @@ function CreateEbnfGrammar(myna) {
 		
 		// patterns 
         let _this = this;
-        this.group = // m.parenthesized(
-			m.seq('(', this.ws,
-            // using a lazy evaluation rule to allow recursive rule definitions  
-            m.delay(function() { return _this.pattern; })
-			, ')'
-        );
-		// this.group		= m.parenthesized(this.pattern); // recursion
+        this.group 			= m.seq('(', this.ws, m.delay(function() { return _this.pattern; }), ')');  // using a lazy evaluation rule to allow recursive rule definitions  
 		this.term			= m.choice(this.identifier, this.group, this.string, this.charClass);
 		this.repeatOp		= m.char('?+*').ast;
 		this.repeat			= m.seq(this.term, this.repeatOp.opt, this.ws);
@@ -47,9 +41,8 @@ function CreateEbnfGrammar(myna) {
 		this.alternate		= m.seq(this.altOp, this.ws, this.concat);  // precedence of exclusion '-' not clear in XML spec, we make it same as '|', to make the tree more flat
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
 		
-		this.newLine		= m.seq(m.seq(this.comment, this.ws).opt, m.choice('\n','\r\n'));
-		this.rule 			= m.seq(this.identifier, this.ws, '::=', this.ws, this.pattern).ast;
-		this.grammar		= m.seq(this.newLine.zeroOrMore, this.rule, m.seq(this.newLine.oneOrMore, this.rule).zeroOrMore, this.newLine.zeroOrMore).ast;
+		this.rule 			= m.seq(this.identifier, this.ws, '::=', this.ws, this.pattern, m.newLine).ast;  // end each rule with newLine, makes the syntax more orthogonal/robust/simpler
+		this.grammar		= m.choice(this.rule, m.seq(this.ws, m.newLine)).oneOrMore.ast;
     };
 
     // Register the grammar, providing a name and the default parse rule
