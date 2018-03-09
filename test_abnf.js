@@ -1,10 +1,16 @@
-// Reference the Myna module
+const fs = require('fs');
 const myna = require('./myna');
 const grammar = require('./grammars/grammar_abnf')(myna);
+const Mark = require('mark-js');
+const Template = require('mark-template');
+const prettier = require("prettier");
 
 function loadSource(fname) {
-	const fs = require('fs');
 	return fs.readFileSync(fname).toString(); 
+}
+
+function writeFile(name, fdata) {
+	fs.writeFileSync(name, fdata);
 }
 
 function printNode(ast, out, indent) {
@@ -23,12 +29,27 @@ function printNode(ast, out, indent) {
 	return out;
 }
 
+function buildAst(ast) {
+	let name = ast.name;
+	// process children
+	let child = [];
+	for (let n of ast.children) {
+		child.push(buildAst(n));
+	}
+	// terminal nodes
+	if (name === 'rulename' || name === 'repeat') { 
+		child.push(ast.allText);
+	}
+	return Mark(name, null, child);
+}
+
 // Get the parser 
 let parser = myna.parsers.abnf;
 
 // Parse some input and print the AST
 // loadSource('./grammars/abnf.abnf');
-let input = loadSource('./grammars/abnf.abnf');
+// let input = loadSource('./grammars/abnf.abnf');
+let input = loadSource('./grammars/ini-file.abnf');
 
 try {
     var ast = parser(input);
@@ -36,8 +57,16 @@ try {
 		console.log("input does not match grammar");
 	} else {
 		// issue: input might not be fully parsed when the parsing ends
-		let out = printNode(ast, '', '');
-		console.log(out);
+		let markAst = buildAst(ast);
+		console.log(Mark.stringify(markAst, {space:'  '}));
+		
+		// transform the AST into a parser in JS
+		var tmpl = Template.compile(loadSource('abnf_grammar.mt'));
+		var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
+		
+		// format with prettier
+		output = prettier.format(output);  console.log(output);
+		writeFile('_grammar.js', output);
 	}
 }
 catch(e) {
