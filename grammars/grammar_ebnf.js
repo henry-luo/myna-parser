@@ -19,9 +19,9 @@ function CreateEbnfGrammar(myna) {
 		this.rangeSeq		= m.choice(this.hashRange, this.charRange).oneOrMore;
 		this.charSeq		= m.notChar('-]'); 
 		
-		this.includeClass	= m.choice(this.rangeSeq, this.charSeq).ast;
-		this.excludeClass	= m.seq('^', m.choice(this.hashRange, this.charRange, this.charSeq)).ast;
-		this.charClass		= m.seq("[", m.choice(this.excludeClass, this.includeClass), "]");
+		this.includeChar	= m.choice(this.rangeSeq, this.charSeq).ast;
+		this.excludeChar	= m.seq('^', m.choice(this.hashRange, this.charRange, this.charSeq)).ast;
+		this.charClass		= m.seq("[", m.choice(this.excludeChar, this.includeChar), "]");
 		
         // literal string
         this.singleQuoteStr = m.singleQuoted(m.notChar("'").oneOrMore);

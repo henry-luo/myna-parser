@@ -39,7 +39,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'rulename' || name === 'repeat') { 
+	if (name === 'rulename' || name === 'repeat' || name == 'char_val' || name == 'num_val' || name == 'prose_val') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
@@ -68,7 +68,7 @@ try {
 		var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
 		
 		// format with prettier
-		// output = prettier.format(output);  
+		output = prettier.format(output);  
 		console.log(output);
 		writeFile('_grammar.js', output);
 	}
