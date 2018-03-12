@@ -26,9 +26,10 @@
     "full": "npm run build && npm test && npm run testBrowser && npm run makesite && npm run copyfiles && npm run makedist"
   },
   "devDependencies": {
+    "console-group": "^0.3.3",
     "cpx": "~1.5",
     "mark-js": "^0.5.3",
-    "mark-template": "^0.1.3",
+    "mark-template": "^0.1.5",
     "mocha": "~3.4",
     "prettier": "1.11.1",
     "typescript": "~2.0",

@@ -24,7 +24,7 @@
 		"this." {this.model[0][0]} " = " {apply to:{this.model[1]}} ";\n"
 	}
 	{pattern
-		'pattern'
+		{apply}
 	}
 	{alternation
 		'alternation'

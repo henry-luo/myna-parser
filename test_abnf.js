@@ -29,6 +29,8 @@ function printNode(ast, out, indent) {
 	return out;
 }
 
+let obj_id = 0;
+
 function buildAst(ast) {
 	let name = ast.name;
 	// process children
@@ -40,7 +42,8 @@ function buildAst(ast) {
 	if (name === 'rulename' || name === 'repeat') { 
 		child.push(ast.allText);
 	}
-	return Mark(name, null, child);
+	obj_id++;
+	return Mark(name, {$id:obj_id}, child.length ? child:null);
 }
 
 // Get the parser 
@@ -65,7 +68,8 @@ try {
 		var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
 		
 		// format with prettier
-		output = prettier.format(output);  console.log(output);
+		// output = prettier.format(output);  
+		console.log(output);
 		writeFile('_grammar.js', output);
 	}
 }
