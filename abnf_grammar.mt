@@ -12,21 +12,26 @@
 			};
 
 			// Register the grammar, providing a name and the default parse rule
-			return m.registerGrammar("abnf", g, g.grammar);
+			return m.registerGrammar("''' {this.model.name} '", g, g.' {this.model[0][0][0]} ''');
 		};
 
 		// Export the grammar for usage by Node.js and CommonJs compatible module loaders 
 		if (typeof module === "object" && module.exports) 
-			module.exports = CreateAbnfGrammar;
+			module.exports = CreateGrammar;
 		'''
 	}
 	
 	{rule
-		"this." {this.model[0][0]} " = " {apply to:{this.model[1]}} ";\n"
+		"this." 
+		{this.model[0][0]} " = " {apply to:{this.model[2]}}
+		{if is:{this.model[1][0] === '::=' || this.model[1][0] == ':='}
+			".ast"
+		}
+		";\n"
 	}
 	
 	{pattern
-		"m." {this.model.filter(r => r.constructor && r.constructor.name == 'alternation').length && 'seq' || 'choice'} "("
+		"m." {this.model.filter(r => r.constructor && r.constructor.name == 'alternation').length && 'choice' || 'seq'} "("
 		{for each:'r' of:{this.model}
 			{if not:{Object.is(r, this.model[0])} 
 				", "

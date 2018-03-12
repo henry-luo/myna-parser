@@ -30,18 +30,18 @@
 ; in an application-dependent manner.
 ;
 ;
-IniFile         = *(BlankLine/ValueLine) *Section
+IniFile         := *(BlankLine/ValueLine) *Section
 Section         = SectionLine *(BlankLine/ValueLine)
 SectionLine     = GoodSectionLine/BadSectionLine
 GoodSectionLine = "[" wsp SectionName wsp "]" wsp [comment] LineEnd
 BadSectionLine  = "[" *any LineEnd;
-ValueLine       = GoodValueLine/BadValueLine
+ValueLine       := GoodValueLine/BadValueLine
 GoodValueLine   = KeyName wsp "=" wsp ValueArray wsp [comment] LineEnd
 BadValueLine    = (%d33-90/%d92-126) *any LineEnd
 ValueArray      = Value *(wsp "," wsp Value)
 SectionName     = (alpha/%d95) *(alpha/digit/%d95)
-KeyName         = (alpha/%d95) *(alpha/digit/%d95)
-Value           = DQuotedString/SQuotedString/AlphaDigit
+KeyName         ::= (alpha/%d95) *(alpha/digit/%d95)
+Value           ::= DQuotedString/SQuotedString/AlphaDigit
 DQuotedString   = %d34 1*(%d32-33/%d35-126) %d34
 SQuotedString   = %d39 1*(%d32-38/%d40-126) %d39
 AlphaDigit      = 1*(alpha/digit)
@@ -49,7 +49,7 @@ BlankLine       = GoodBlankLine/BadBlankLine
 GoodBlankLine   = wsp [comment] LineEnd
 BadBlankLine    = (%d32/%d9) wsp (%d33-58/%d60-126) *any LineEnd
 LineEnd         = %d13.10/%d10/%d13
-comment         = %d59 *any
+comment         = (%d59/%d35) *any
 wsp             = *(%d32/%d9)
 alpha           = %d65-90/%d97-122
 digit           = %d48-57

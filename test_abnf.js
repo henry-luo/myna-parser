@@ -39,7 +39,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'rulename' || name === 'repeat' || name == 'char_val' || name == 'num_val' || name == 'prose_val') { 
+	if (name === 'rulename' || name === 'repeat' || name == 'char_val' || name == 'num_val' || name == 'prose_val' || name == 'defined_as') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
@@ -61,6 +61,7 @@ try {
 	} else {
 		// issue: input might not be fully parsed when the parsing ends
 		let markAst = buildAst(ast);
+		markAst.name = 'ini';
 		console.log(Mark.stringify(markAst, {space:'  '}));
 		
 		// transform the AST into a parser in JS
@@ -70,7 +71,7 @@ try {
 		// format with prettier
 		output = prettier.format(output);  
 		console.log(output);
-		writeFile('_grammar.js', output);
+		writeFile('grammars/_grammar_ini.js', output);
 	}
 }
 catch(e) {

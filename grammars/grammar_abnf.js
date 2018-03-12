@@ -38,8 +38,8 @@ function CreateAbnfGrammar(myna) {
 		this.pattern    	=  m.seq(this.concatenation, this.alternation.zeroOrMore).ast;
 		
 		// rule
-		this.defined_as     =  m.seq(this.c_wsp, m.choice("=/", "="), this.c_wsp); /* basic rules definition and incremental alternatives */
-		this.rule           =  m.seq(this.rulename, this.defined_as, this.pattern, this.c_wsp, this.c_nl).ast; /* continues if next line starts with white space */
+		this.defined_as     =  m.choice("::=", ":=", "=").ast; /* basic rules definition; incremental alternatives "=/" is not supported */
+		this.rule           =  m.seq(this.rulename, this.c_wsp, this.defined_as, this.c_wsp, this.pattern, this.c_wsp, this.c_nl).ast; /* continues if next line starts with white space */
 		this.grammar		=  m.choice(this.rule, m.seq(this.c_wsp, this.c_nl)).oneOrMore.ast;
     };
 
