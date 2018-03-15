@@ -22,7 +22,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'name' || name === 'escapedChar' || name === 'text' || name === 'option' || name === 'argument' || name === 'amp' || name === 'end') { 
+	if (name === 'name' || name === 'escapedCmd' || name === 'text' || name === 'option' || name === 'argument' || name === 'amp' || name === 'end' || name === 'comment' || name === 'emptyLine') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
@@ -45,6 +45,12 @@ try {
 		// issue: input might not be fully parsed when the parsing ends
 		let markAst = buildAst(ast);
 		console.log(Mark.stringify(markAst, {space:'  '}));
+		
+		// transform the AST back into Latex source
+		var tmpl = Template.compile(loadSource('./test/latex.mt'));
+		var output = Template.apply(tmpl, markAst).join('');
+		console.log(output);
+		writeFile('test/input/_latex.tex', output);		
 	}
 }
 catch(e) {
