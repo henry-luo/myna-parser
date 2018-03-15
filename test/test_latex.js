@@ -22,8 +22,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'name' || name === 'escapedCmd' || name === 'text' || name === 'option' || name === 'argument' || 
-		name === 'amp' || name === 'start' || name === 'end' || name === 'comment' || name === 'emptyLine') { 
+	if (name === 'name' || name === 'escapedCmd' || name === 'text' || name === 'option' || name === 'argument' || name === 'amp' || name === 'start' || name === 'end' || name === 'comment' || name === 'emptyLine') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
