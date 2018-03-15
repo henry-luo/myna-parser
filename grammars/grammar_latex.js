@@ -5,15 +5,16 @@ function CreateGrammar(myna) {
     let m = myna;    
 
     let g = new function() {
+		this.escapedChar    = m.char("#$%^&_{}~\\");  // escapedChar rule not very solid
+		
 		// tex command
 		this.option			= m.notChar(",]").oneOrMore.ast;
 		this.params			= m.seq('[', this.option.opt, m.seq(',', this.option).zeroOrMore, ']').ast;
 		this.end			= m.seq('{', m.letters, '}').ast;
-		this.argument		= m.seq('{', m.notChar("\\}").zeroOrMore, '}').ast; // it seems {} can be nested in argument
+		this.argument		= m.seq('{', m.choice(m.notChar("\\}").oneOrMore, m.seq('\\', this.escapedChar)).zeroOrMore, '}').ast; // it seems {} can be nested in argument
 		this.name			= m.letters.ast;
 		this.command		= m.seq(m.not('end{'), this.name, this.params.opt, this.argument.zeroOrMore).ast;
 		
-        this.escapedChar    = m.seq(m.char("#$%^&_{}~\\"), this.argument.opt).ast;  // escapedChar rule not very solid
 		this.comment		= m.seq('%', m.advanceUntilPast(m.newLine), m.char(" \t").zeroOrMore);
 		this.text			= m.notChar("#$%^&_{}~\\").oneOrMore.ast;
 		this.amp			= m.text('&').ast;
@@ -22,7 +23,8 @@ function CreateGrammar(myna) {
 		let _this = this;
 		this.group			= m.seq('{', m.delay(function() { return _this.latex; }), '}').ast;
 		this.environment	= m.seq('begin', this.argument, this.params.opt, m.delay(function() { return _this.latex; }), '\\end', this.end).ast;
-		this.escaped		= m.seq('\\', m.choice(this.environment, this.command, this.escapedChar));
+		this.escapedCmd		= m.seq(this.escapedChar, this.argument.opt).ast;  
+		this.escaped		= m.seq('\\', m.choice(this.environment, this.command, this.escapedCmd));
 		
         this.latex			= m.choice(this.escaped, this.group, this.comment, this.amp, this.text).zeroOrMore.ast;
     };
