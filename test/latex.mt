@@ -36,11 +36,13 @@
 		'{' {apply} '}'
 	}
 	
+	{start
+		'\\begin{' {apply} '}'
+	}
 	{end
-		'\\end' {apply}
+		'\\end{' {apply} '}'
 	}
 	{environment
-		'\\begin'
 		{apply}
 	}
 	
