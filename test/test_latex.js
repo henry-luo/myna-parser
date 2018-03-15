@@ -33,9 +33,6 @@ function buildAst(ast) {
 // Get the parser 
 let parser = myna.parsers.latex;
 
-// Parse some input and print the AST
-// loadSource('./grammars/abnf.abnf');
-// let input = loadSource('./grammars/abnf.abnf');
 let input = loadSource('./test/input/caption.tex');
 
 try {
