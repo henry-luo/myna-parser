@@ -2,3 +2,4 @@ debug.log
 node_modules/
 /_grammar.js
 /test/input/_latex.tex
+/grammars/_grammar_ini.js

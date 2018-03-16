@@ -1,6 +1,6 @@
 const fs = require('fs');
-const myna = require('./myna');
-const grammar = require('./grammars/grammar_abnf')(myna);
+const myna = require('./../myna');
+const grammar = require('./../grammars/grammar_ebnf')(myna);
 const Mark = require('mark-js');
 const Template = require('mark-template');
 const prettier = require("prettier");
@@ -9,25 +9,25 @@ function loadSource(fname) {
 	return fs.readFileSync(fname).toString(); 
 }
 
-function writeFile(name, fdata) {
-	fs.writeFileSync(name, fdata);
-}
-
-function printNode(ast, out, indent) {
-	let name = ast.name;
-	out += '\n'+ indent +'{' + name;
-	
-	// print children
-	for (let n of ast.children) {
-		out = printNode(n, out, indent+'  ');
+/*
+function printObj(obj, out, indent) {
+	if (obj instanceof Array) {
+		out += '[';
+		for (let n in obj) {
+			out += printObj(n, out, indent+'  ') + ',';
+		}
+		out += ']';
+	} else {
+		out += '\n'+ indent +'{'+ obj.constructor.name;
+		// print children
+		for (let n in obj) {
+			out += n + ':' + printObj(n, out, indent+'  ');
+		}
+		out += '\n'+ indent +'}';	
 	}
-	
-	// node specific printing
-	if (name === 'rulename' || name === 'repeat') { out += " '" + ast.allText + "'"; }
-	
-	out += '\n'+ indent +'}';
 	return out;
 }
+*/
 
 let obj_id = 0;
 
@@ -39,7 +39,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'rulename' || name === 'repeat' || name == 'char_val' || name == 'num_val' || name == 'prose_val' || name == 'defined_as') { 
+	if (name === 'identifier' || name === 'repeatOp' || name === 'altOp') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
@@ -47,12 +47,10 @@ function buildAst(ast) {
 }
 
 // Get the parser 
-let parser = myna.parsers.abnf;
+let parser = myna.parsers.ebnf;
 
 // Parse some input and print the AST
-// loadSource('./grammars/abnf.abnf');
-// let input = loadSource('./grammars/abnf.abnf');
-let input = loadSource('./grammars/ini-file.abnf');
+let input = loadSource('./grammars/pascal.ebnf');
 
 try {
     var ast = parser(input);
@@ -60,16 +58,16 @@ try {
 		console.log("input does not match grammar");
 	} else {
 		// issue: input might not be fully parsed when the parsing ends
-		let markAst = buildAst(ast);
-		markAst.name = 'ini';
+		let markAst = buildAst(ast);  console.log(markAst);
+		// markAst.name = 'ini';
 		console.log(Mark.stringify(markAst, {space:'  '}));
 		
 		// transform the AST into a parser in JS
-		var tmpl = Template.compile(loadSource('abnf_grammar.mt'));
+		var tmpl = Template.compile(loadSource('grammars/abnf_grammar.mt'));
 		var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
 		
 		// format with prettier
-		output = prettier.format(output);  
+		//output = prettier.format(output);  
 		console.log(output);
 		writeFile('grammars/_grammar_ini.js', output);
 	}
