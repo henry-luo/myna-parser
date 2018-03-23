@@ -41,7 +41,8 @@ function CreateEbnfGrammar(myna) {
 		this.alternate		= m.seq(this.altOp, this.ws, this.concat);  // precedence of exclusion '-' not clear in XML spec, we make it same as '|', to make the tree more flat
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
 		
-		this.rule 			= m.seq(this.identifier, this.ws, '::=', this.ws, this.pattern, m.newLine).ast;  // end each rule with newLine, makes the syntax more orthogonal/robust/simpler
+		this.defined_as     =  m.choice("::=", ":=", "=").ast;
+		this.rule 			= m.seq(this.identifier, this.ws, this.defined_as, this.ws, this.pattern, m.newLine).ast;  // end each rule with newLine, makes the syntax more orthogonal/robust/simpler
 		this.grammar		= m.choice(this.rule, m.seq(this.ws, m.newLine)).oneOrMore.ast;
     };
 
