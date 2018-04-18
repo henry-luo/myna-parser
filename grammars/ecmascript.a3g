@@ -47,7 +47,7 @@ whiteSpace:
 	;
 
 lineTerminator:
-	| LF
+	LF
 	| CR
 	| LS
 	| PS
@@ -96,9 +96,9 @@ token:
 	reservedWord
 	| identifier
 	/* syntactic predicate used to disambiguate between DOT on ALT 3 and ALT 5 */
-	| (DOT decimalDigits)=> numericLiteral
+	| (DOT decimalDigits) /*=> numericLiteral */
 	/* syntactic predicate used to disambiguate between APOSTROPHE on ALT 4 and ALT 5 */
-	| (APOSTROPHE (singleStringCharacters)? APOSTROPHE)=> stringLiteral
+	| (APOSTROPHE (singleStringCharacters)? APOSTROPHE) /*=> stringLiteral*/
 	| punctuator
 	;
 
@@ -151,7 +151,7 @@ identifierPart:
 	/* syntactic predicate to remove non-determinism upon alts 1 and 5 
 	 * - always choose the identifierStart when possible
 	 */
-	(unicodeEscapeSequence identifierPart)=> identifierStart
+	(unicodeEscapeSequence identifierPart) /*=> identifierStart */
 	| unicodeCombiningMark
 	| unicodeDigit
 	| unicodeConnectorPunctuation
@@ -439,7 +439,7 @@ strUnsignedDecimalLiteral:
 	 */
 	'Infinity'
 	/* syntactic predicate used to remove nondet between ALTs 2 and 4 */
-	| (decimalDigits DOT)=> decimalDigits DOT (decimalDigits)? (exponentPart)?
+	| (decimalDigits DOT) /*=> decimalDigits*/ DOT (decimalDigits)? (exponentPart)?
 	| DOT decimalDigits (exponentPart)?
 	| decimalDigits (exponentPart)?
 	;
@@ -587,7 +587,7 @@ newExpression:
 	 * | 'new' newExpression
 	 */
 	/* syntactic predicate added to resolve between nondet in ALTs 1 and 2 */
-	('new' newExpression)=> 'new' newExpression
+	('new' newExpression) /*=> 'new' newExpression */
 	| memberExpression
 	;
 
@@ -636,7 +636,7 @@ leftHandSideExpression:
 	 * newExpression
 	 * | callExpression
 	 */
-	('new' newExpression)=> newExpression
+	('new' newExpression) /*=> newExpression */
 	| callExpression
 	;
 
@@ -904,8 +904,9 @@ assignmentExpression:
 	 * conditionalExpression
 	 * | leftHandSideExpression assignmentOperator assignmentExpression
 	 */
-	(leftHandSideExpression assignmentOperator) =>
-	leftHandSideExpression assignmentOperator assignmentExpression
+	(leftHandSideExpression assignmentOperator) /*=>
+	leftHandSideExpression assignmentOperator */
+	assignmentExpression
 	| conditionalExpression
 	;
 
@@ -1025,7 +1026,7 @@ initialiserNoln:
 	;
 
 emptyStatement:
-	;
+	';' ;
 
 expressionStatement:
 	/* [lookahead not a member of {{, function}} */ expression SEMI
@@ -1250,7 +1251,7 @@ atom:
 	patternCharacter
 	| DOT
 	| BSLASH atomEscape
-	| characterClass
+	// | characterClass
 	| LPAREN ((COLON|EQ|EXCLAMATION)? disjunction) RPAREN
 	;
 
@@ -1296,15 +1297,15 @@ decimalEscape:
 	decimalIntegerLiteral /* lookahead not a member of decimalDigit */
 	;
 
-characterClass:
+//characterClass:
 	/* [ [lookahead not a member of {^}] ClassRanges ] 
 	| [ ^ classRanges ]
 	*/
-	;
+	//;
 	
 classRanges:
-	/* empty */
-	| nonemptyClassRanges
+	/* empty | nonemptyClassRanges */
+	nonemptyClassRanges
 	;
 
 nonemptyClassRanges:
@@ -1428,7 +1429,7 @@ UPPER_ALPHA_CHAR
 	:	('a'..'z');
 
 WS:	// ignore white space as it doesn't matter
-	( ' ' | '\r' '\n' {newline();}| '\n' {newline();} | '\t' ) /* { $setType(Token.SKIP); } */
+	' ' | '\r' '\n' | '\n' | '\t' // ( ' ' | '\r' '\n' {newline();}| '\n' {newline();} | '\t' ) /* { $setType(Token.SKIP); } */
 	;
 
 SOURCE_CHAR: ('\u0000'..'\uFFFE');
