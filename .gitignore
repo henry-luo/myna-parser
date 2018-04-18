@@ -4,3 +4,4 @@ node_modules/
 /test/input/_latex.tex
 /grammars/_grammar_ini.js
 /yarn.lock
+/grammars/_grammar_antla.js

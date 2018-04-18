@@ -9,6 +9,10 @@ function loadSource(fname) {
 	return fs.readFileSync(fname).toString(); 
 }
 
+function writeFile(name, fdata) {
+	fs.writeFileSync(name, fdata);
+}
+
 let obj_id = 0;
 
 function buildAst(ast) {
@@ -19,7 +23,7 @@ function buildAst(ast) {
 		child.push(buildAst(n));
 	}
 	// terminal nodes
-	if (name === 'identifier' || name === 'repeatOp' || name === 'altOp') { 
+	if (name === 'identifier' || name === 'repeatOp' || name === 'altOp' || name === 'string') { 
 		child.push(ast.allText);
 	}
 	obj_id++;
@@ -43,13 +47,14 @@ try {
 		console.log(Mark.stringify(markAst, {space:'  '}));
 		
 		// transform the AST into a parser in JS
-		//var tmpl = Template.compile(loadSource('grammars/abnf_grammar.mt'));
-		//var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
+		let src = loadSource('grammars/antla_grammar.mt');  
+		var tmpl = Template.compile(src);  console.log('tmpl', tmpl);
+		var output = Template.apply(tmpl, markAst).join('');  console.log('output type', typeof output);
 		
 		// format with prettier
 		//output = prettier.format(output);  
-		//console.log(output);
-		//writeFile('grammars/_grammar_ini.js', output);
+		console.log(output);
+		writeFile('grammars/_grammar_antla.js', output);
 	}
 }
 catch(e) {

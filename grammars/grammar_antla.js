@@ -25,7 +25,7 @@ function CreateGrammar(myna) {
 		this.repeat			= m.seq(this.term, this.repeatOp.opt, this.ws);
 		this.concat			= this.repeat.oneOrMore;
 		this.altOp			= '|'; // m.choice('|','-').ast;
-		this.alternate		= m.seq(this.altOp, this.ws, this.concat);  // precedence of exclusion '-' not clear in XML spec, we make it same as '|', to make the tree more flat
+		this.alternate		= m.seq(this.altOp, this.ws, this.concat);
 		this.pattern 		= m.seq(this.concat, this.alternate.zeroOrMore).ast;
 		
 		this.defined_as     = ":";
